@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des étudiants</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        thead {
+            background: #2c3e50;
+            color: #fff;
+        }
+        th, td {
+            padding: 14px 18px;
+            text-align: left;
+        }
+        tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+        tbody tr:hover {
+            background: #f0f4f8;
+        }
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #fff;
+            background: #3498db;
+        }
+        #error {
+            color: #c0392b;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📋 Liste des étudiants</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Niveau</th>
+        </tr>
+        </thead>
+        <tbody id="studentsBody">
+        <tr><td colspan="3">Chargement...</td></tr>
+        </tbody>
+    </table>
+    <p id="error"></p>
+</div>
+
+<script>
+    fetch('/api/students')
+        .then(response => {
+            if (!response.ok) throw new Error('Erreur réseau: ' + response.status);
+            return response.json();
+        })
+        .then(students => {
+            const body = document.getElementById('studentsBody');
+            body.innerHTML = '';
+            students.forEach(s => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+          <td>${s.id}</td>
+          <td>${s.name}</td>
+          <td><span class="badge">${s.level}</span></td>
+        `;
+                body.appendChild(row);
+            });
+        })
+        .catch(err => {
+            document.getElementById('studentsBody').innerHTML = '';
+            document.getElementById('error').textContent = 'Impossible de récupérer les données : ' + err.message;
+        });
+</script>
+</body>
+</html>
